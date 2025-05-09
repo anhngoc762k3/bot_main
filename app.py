@@ -40,6 +40,16 @@ def load_links(json_path="data.json"):
 
 extra_links = load_links()
 
+# Tìm link bài học liên quan
+def find_related_links(question):
+    links = []
+    for keyword, link in extra_links.items():
+        if keyword.lower() in question.lower():
+            links.append(f'<a href="{link}" target="_blank">{keyword.title()}</a>')
+    if links:
+        return "<br><br><strong>🔗 Link bài học liên quan:</strong><br>" + "<br>".join(links)
+    return ""
+
 @app.route("/", methods=["GET"])
 def home():
     return "✅ API đang chạy. Gửi POST đến /ask với câu hỏi."
@@ -53,15 +63,12 @@ def ask():
         if not question:
             return jsonify({"error": "Thiếu câu hỏi"}), 400
 
-        # Tìm keyword liên quan để bổ sung link bài giảng
-        related_link = ""
-        for keyword, link in extra_links.items():
-            if keyword.lower() in question.lower():
-                related_link = f"\n\nTham khảo thêm tại: {link}"
-                break
+        # Trích xuất link bài học liên quan
+        link_html = find_related_links(question)
 
+        # Chuẩn bị ngữ cảnh và prompt
         context = pdf_text[:6000] if len(pdf_text) > 6000 else pdf_text
-        prompt = f"Đây là một đoạn văn từ tài liệu: {context}\n\nCâu hỏi: {question}\nTrả lời:{related_link}"
+        prompt = f"Đây là một đoạn văn từ tài liệu: {context}\n\nCâu hỏi: {question}\nTrả lời:"
 
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -69,7 +76,9 @@ def ask():
         )
 
         answer = response.choices[0].message.content
-        return jsonify({"answer": answer})
+        final_answer = answer.replace("\n", "<br>") + link_html  # HTML định dạng và chèn link
+
+        return jsonify({"answer": final_answer})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
