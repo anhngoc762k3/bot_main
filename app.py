@@ -17,6 +17,7 @@ app = Flask(__name__)
 
 # Đọc nội dung PDF ngay khi server khởi động
 pdf_file_path = 'MTvE.pdf'
+
 def read_pdf(file_path):
     with pdfplumber.open(file_path) as pdf:
         text = ""
@@ -27,6 +28,11 @@ def read_pdf(file_path):
     return text
 
 pdf_text = read_pdf(pdf_file_path)
+
+# Trang chủ đơn giản để kiểm tra trạng thái ứng dụng
+@app.route("/", methods=["GET"])
+def home():
+    return "✅ API đang chạy. Gửi POST đến /ask với câu hỏi."
 
 # API trả lời câu hỏi từ PDF
 @app.route("/ask", methods=["POST"])
