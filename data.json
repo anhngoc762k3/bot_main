@@ -1,0 +1,17 @@
+{
+    "thong_tin": [
+      "Sinh viên phải có mặt trước giờ thi 15 phút.",
+      "Không được mang tài liệu vào phòng thi."
+    ],
+    "bai_hoc": [
+      {
+        "keyword": "máy tính",
+        "link": "https://vi.wikipedia.org/wiki/Máy_tính"
+      },
+      {
+        "keyword": "hệ điều hành",
+        "link": "https://thuvienphapluat.vn/lao-dong-tien-luong/he-dieu-hanh-la-gi-cac-he-dieu-hanh-tren-may-tinh-va-vi-du-cu-the-co-phai-boi-thuong-thiet-hai-khi--30619.html"
+      }
+    ]
+  }
+  
