@@ -1,14 +1,13 @@
 import asyncio
-from asyncio import WindowsSelectorEventLoopPolicy
+import platform
 from flask import Flask, request, jsonify
 from g4f.client import Client
 import pdfplumber
 
-# Cho Windows (bỏ qua nếu không dùng local Windows)
-try:
+# Chỉ áp dụng WindowsSelectorEventLoopPolicy nếu đang chạy trên Windows
+if platform.system() == "Windows":
+    from asyncio import WindowsSelectorEventLoopPolicy
     asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
-except:
-    pass
 
 client = Client()
 app = Flask(__name__)
@@ -51,4 +50,6 @@ def ask():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000)
+    import os
+    port = int(os.environ.get("PORT", 8000))  # dùng cổng Render cấp nếu có
+    app.run(host="0.0.0.0", port=port)
