@@ -1,39 +1,29 @@
-import asyncio
-import platform
 import json
 from flask import Flask, request, jsonify
 from g4f.client import Client
 import pdfplumber
-
-# Chỉ import nếu chạy Windows
-if platform.system() == "Windows":
-    try:
-        from asyncio import WindowsSelectorEventLoopPolicy
-        asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
-    except ImportError:
-        pass
+import re
 
 client = Client()
 app = Flask(__name__)
 
 # Đọc PDF khi khởi động
-pdf_file_path = 'MTvE.pdf'
 def read_pdf(file_path):
-    with pdfplumber.open(file_path) as pdf:
-        text = ""
-        for page in pdf.pages:
-            page_text = page.extract_text()
-            if page_text:
-                text += page_text + "\n"
-    return text
+    try:
+        with pdfplumber.open(file_path) as pdf:
+            return "\n".join(page.extract_text() or "" for page in pdf.pages)
+    except Exception as e:
+        print("Lỗi đọc file PDF:", e)
+        return ""
 
-pdf_text = read_pdf(pdf_file_path)
+pdf_text = read_pdf("MTvE.pdf")
 
-# Đọc links từ file JSON
+# Đọc links từ file JSON (theo cấu trúc mới có "bai_hoc": [{"keyword": ..., "link": ...}])
 def load_links(json_path="data.json"):
     try:
         with open(json_path, "r", encoding="utf-8") as f:
-            return json.load(f)
+            data = json.load(f)
+            return {item["keyword"]: item["link"] for item in data.get("bai_hoc", [])}
     except Exception as e:
         print("Lỗi đọc file JSON:", e)
         return {}
@@ -42,9 +32,11 @@ extra_links = load_links()
 
 # Tìm link bài học liên quan
 def find_related_links(question):
+    question = question.lower()
     links = []
     for keyword, link in extra_links.items():
-        if keyword.lower() in question.lower():
+        # So khớp chính xác từ khóa trong câu hỏi (tránh bị dính từ gần giống)
+        if re.search(rf'\b{re.escape(keyword.lower())}\b', question):
             links.append(f'<a href="{link}" target="_blank">{keyword.title()}</a>')
     if links:
         return "<br><br><strong>🔗 Link bài học liên quan:</strong><br>" + "<br>".join(links)
@@ -63,12 +55,12 @@ def ask():
         if not question:
             return jsonify({"error": "Thiếu câu hỏi"}), 400
 
-        # Trích xuất link bài học liên quan
+        # Gợi ý thêm link bài học
         link_html = find_related_links(question)
 
         # Chuẩn bị ngữ cảnh và prompt
-        context = pdf_text[:6000] if len(pdf_text) > 6000 else pdf_text
-        prompt = f"Đây là một đoạn văn từ tài liệu: {context}\n\nCâu hỏi: {question}\nTrả lời:"
+        context = pdf_text[:6000]  # Giới hạn ký tự
+        prompt = f"Đây là một đoạn văn từ tài liệu:\n{context}\n\nCâu hỏi: {question}\nTrả lời:"
 
         response = client.chat.completions.create(
             model="gpt-4o-mini",
@@ -76,7 +68,7 @@ def ask():
         )
 
         answer = response.choices[0].message.content
-        final_answer = answer.replace("\n", "<br>") + link_html  # HTML định dạng và chèn link
+        final_answer = answer.replace("\n", "<br>") + link_html
 
         return jsonify({"answer": final_answer})
 
