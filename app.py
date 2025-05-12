@@ -16,7 +16,7 @@ def read_pdf(file_path):
         print("Lỗi đọc file PDF:", e)
         return ""
 
-pdf_text = read_pdf("t1.pdf")
+pdf_text = read_pdf("t2.pdf")
 
 # Đọc links từ file JSON (theo cấu trúc mới có "bai_hoc": [{"keyword": ..., "link": ...}])
 def load_links(json_path="data.json"):
