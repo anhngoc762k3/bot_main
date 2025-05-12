@@ -1,17 +1,28 @@
 {
-    "thong_tin": [
-      "Sinh viên phải có mặt trước giờ thi 15 phút.",
-      "Không được mang tài liệu vào phòng thi."
-    ],
-    "bai_hoc": [
-      {
-        "keyword": "máy tính",
-        "link": "https://vi.wikipedia.org/wiki/Máy_tính"
-      },
-      {
-        "keyword": "hệ điều hành",
-        "link": "https://thuvienphapluat.vn/lao-dong-tien-luong/he-dieu-hanh-la-gi-cac-he-dieu-hanh-tren-may-tinh-va-vi-du-cu-the-co-phai-boi-thuong-thiet-hai-khi--30619.html"
-      }
-    ]
-  }
-  
+  "bai_hoc": [
+    {
+      "chu_de": "Máy tính và em",
+      "tieu_de": "Máy tính là gì?",
+      "link_bai_giang": "https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=M%C3%A1y%20t%C3%ADnh%20l%C3%A0%20g%C3%AC%3F&id_lecture=1",
+      "link_bai_tap": "https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=1"
+    },
+    {
+      "chu_de": "Máy tính và em",
+      "tieu_de": "Sử dụng chuột máy tính",
+      "link_bai_giang": "https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=S%E1%BB%AD%20d%E1%BB%A5ng%20chu%E1%BB%99t%20m%C3%A1y%20t%C3%ADnh&id_lecture=3",
+      "link_bai_tap": "https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=3"
+    },
+    {
+      "chu_de": "Máy tính và em",
+      "tieu_de": "An toàn khi sử dụng máy tính",
+      "link_bai_giang": "https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=An%20to%C3%A0n%20thi%E1%BA%BFt%20b%E1%BB%8B%20khi%20s%E1%BB%AD%20d%E1%BB%A5ng%20m%C3%A1y%20t%C3%ADnh&id_lecture=4",
+      "link_bai_tap": "https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=4"
+    },
+    {
+      "chu_de": "Tạo nội dung bằng máy tính",
+      "tieu_de": "Phần mềm tô màu",
+      "link_bai_giang": "https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=Ph%E1%BA%A7n%20m%E1%BB%81m%20t%C3%B4%20m%C3%A0u&id_lecture=5",
+      "link_bai_tap": null
+    }
+  ]
+}
