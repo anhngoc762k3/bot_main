@@ -23,10 +23,10 @@ def load_links(json_path="data.json"):
     try:
         with open(json_path, "r", encoding="utf-8") as f:
             data = json.load(f)
-            return data.get("bai_hoc", [])
+            return {item["keyword"]: item["link"] for item in data.get("bai_hoc", [])}
     except Exception as e:
         print("Lỗi đọc file JSON:", e)
-        return []
+        return {}
 
 extra_links = load_links()
 
@@ -34,15 +34,10 @@ extra_links = load_links()
 def find_related_links(question):
     question = question.lower()
     links = []
-    for item in extra_links:
+    for keyword, link in extra_links.items():
         # So khớp chính xác từ khóa trong câu hỏi (tránh bị dính từ gần giống)
-        keyword = item['chu_de'].lower()  # Hoặc sử dụng tieu_de tùy thuộc vào nội dung bạn muốn khớp
-        link = item['link_bai_giang']  # Sử dụng link bài giảng
-
-        if re.search(rf'\b{re.escape(keyword)}\b', question):
-            # Trả về tên bài học và liên kết thay vì URL trực tiếp
-            links.append(f'<a href="{link}" target="_blank">{item["chu_de"]}</a>')
-
+        if re.search(rf'\b{re.escape(keyword.lower())}\b', question):
+            links.append(f'<a href="{link}" target="_blank">{keyword.title()}</a>')
     if links:
         return "<br><br><strong>🔗 Link bài học liên quan:</strong><br>" + "<br>".join(links)
     return ""
