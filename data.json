@@ -1,17 +1,15 @@
 [
   {
-    "chu_de": "Công nghệ",
-    "tieu_de": "Máy tính",
+    "chu_de": "Máy tính và em",
+    "tieu_de": "Máy tính là gì?",
     "loai": "bai_giang",
-    "noi_dung": "Bài học giới thiệu về cấu tạo và chức năng của máy tính.",
     "link_bai_giang": "https://example.com/bai-giang-may-tinh",
     "link_bai_tap": "https://example.com/bai-tap-may-tinh"
   },
   {
-    "chu_de": "Toán học",
-    "tieu_de": "Cộng trừ trong phạm vi 10",
+    "chu_de": "Tạo nội dung bằng máy tính",
+    "tieu_de": "Phần mềm tô màu",
     "loai": "bai_giang",
-    "noi_dung": "Bài học về phép cộng trừ trong phạm vi 10.",
     "link_bai_giang": "https://example.com/toan-10",
     "link_bai_tap": "https://example.com/bai-tap-toan-10"
   }
