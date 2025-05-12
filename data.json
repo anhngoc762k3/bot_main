@@ -1,27 +1,18 @@
-{
-  "bai_hoc": [
-    {
-      "chu_de": "Máy tính và em",
-      "tieu_de": "Máy tính là gì?",
-      "link_bai_giang": "<a href=\"https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=M%C3%A1y%20t%C3%ADnh%20l%C3%A0%20g%C3%AC%3F&id_lecture=1\" target=\"_blank\">MÁY TÍNH</a>",
-      "link_bai_tap": "<a href=\"https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=1\" target=\"_blank\">MÁY TÍNH</a>"
-    },
-    {
-      "chu_de": "Máy tính và em",
-      "tieu_de": "Sử dụng chuột máy tính",
-      "link_bai_giang": "<a href=\"https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=S%E1%BB%AD%20d%E1%BB%A5ng%20chu%E1%BB%99t%20m%C3%A1y%20t%C3%ADnh&id_lecture=3\" target=\"_blank\">Sử dụng chuột máy tính</a>",
-      "link_bai_tap": "<a href=\"https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=3\" target=\"_blank\">Sử dụng chuột máy tínhH</a>"
-    },
-    {
-      "chu_de": "Máy tính và em",
-      "tieu_de": "An toàn khi sử dụng máy tính",
-      "link_bai_giang": "<a href=\"https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=An%20to%C3%A0n%20thi%E1%BA%BFt%20b%E1%BB%8B%20khi%20s%E1%BB%AD%20d%E1%BB%A5ng%20m%C3%A1y%20t%C3%ADnh&id_lecture=4\" target=\"_blank\">An toàn khi sử dụng máy tính</a>",
-      "link_bai_tap": "<a href=\"https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=4\" target=\"_blank\">An toàn khi sử dụng máy tính</a>"
-    },
-    {
-      "chu_de": "Tạo nội dung bằng máy tính",
-      "tieu_de": "Phần mềm tô màu",
-      "link_bai_giang": "<a href=\"https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=Ph%E1%BA%A7n%20m%E1%BB%81m%20t%C3%B4%20m%C3%A0u&id_lecture=5\" target=\"_blank\">Phần mềm tô màu</a>"
-    }
-  ]
-}
+[
+  {
+    "chu_de": "Công nghệ",
+    "tieu_de": "Máy tính",
+    "loai": "bai_giang",
+    "noi_dung": "Bài học giới thiệu về cấu tạo và chức năng của máy tính.",
+    "link_bai_giang": "https://example.com/bai-giang-may-tinh",
+    "link_bai_tap": "https://example.com/bai-tap-may-tinh"
+  },
+  {
+    "chu_de": "Toán học",
+    "tieu_de": "Cộng trừ trong phạm vi 10",
+    "loai": "bai_giang",
+    "noi_dung": "Bài học về phép cộng trừ trong phạm vi 10.",
+    "link_bai_giang": "https://example.com/toan-10",
+    "link_bai_tap": "https://example.com/bai-tap-toan-10"
+  }
+]

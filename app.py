@@ -1,81 +1,77 @@
-import json
 from flask import Flask, request, jsonify
 from g4f.client import Client
 import pdfplumber
-import re
+import json
+import os
 
-client = Client()
 app = Flask(__name__)
+client = Client()
 
-# Đọc PDF khi khởi động
+# Đọc file JSON bài học
+def load_lessons():
+    with open("data.json", "r", encoding="utf-8") as f:
+        return json.load(f)
+
+lessons_data = load_lessons()
+
+# Đọc nội dung PDF
 def read_pdf(file_path):
-    try:
-        with pdfplumber.open(file_path) as pdf:
-            return "\n".join(page.extract_text() or "" for page in pdf.pages)
-    except Exception as e:
-        print("Lỗi đọc file PDF:", e)
-        return ""
+    with pdfplumber.open(file_path) as pdf:
+        text = ""
+        for page in pdf.pages:
+            extracted = page.extract_text()
+            if extracted:
+                text += extracted + "\n"
+    return text
 
 pdf_text = read_pdf("t2.pdf")
 
-# Đọc links từ file JSON (theo cấu trúc mới có "bai_hoc": [{"keyword": ..., "link": ...}])
-def load_links(json_path="data.json"):
+# Tìm link từ JSON nếu có liên quan
+def search_lesson_link(question):
+    for lesson in lessons_data:
+        if lesson["tieu_de"].lower() in question.lower():
+            return {
+                "title": lesson["tieu_de"],
+                "bai_giang": lesson["link_bai_giang"],
+                "bai_tap": lesson["link_bai_tap"]
+            }
+    return None
+
+# Chatbot trả lời
+def generate_response(question, pdf_text):
     try:
-        with open(json_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            return {item["keyword"]: item["link"] for item in data.get("bai_hoc", [])}
-    except Exception as e:
-        print("Lỗi đọc file JSON:", e)
-        return {}
-
-extra_links = load_links()
-
-# Tìm link bài học liên quan
-def find_related_links(question):
-    question = question.lower()
-    links = []
-    for keyword, link in extra_links.items():
-        # So khớp chính xác từ khóa trong câu hỏi (tránh bị dính từ gần giống)
-        if re.search(rf'\b{re.escape(keyword.lower())}\b', question):
-            links.append(f'<a href="{link}" target="_blank">{keyword.title()}</a>')
-    if links:
-        return "<br><br><strong>🔗 Link bài học liên quan:</strong><br>" + "<br>".join(links)
-    return ""
-
-@app.route("/", methods=["GET"])
-def home():
-    return "✅ API đang chạy. Gửi POST đến /ask với câu hỏi."
-
-@app.route("/ask", methods=["POST"])
-def ask():
-    try:
-        data = request.get_json()
-        question = data.get("question", "")
-
-        if not question:
-            return jsonify({"error": "Thiếu câu hỏi"}), 400
-
-        # Gợi ý thêm link bài học
-        link_html = find_related_links(question)
-
-        # Chuẩn bị ngữ cảnh và prompt
-        context = pdf_text[:6000]  # Giới hạn ký tự
-        prompt = f"Đây là một đoạn văn từ tài liệu:\n{context}\n\nCâu hỏi: {question}\nTrả lời:"
-
+        context = pdf_text[:6000] if len(pdf_text) > 6000 else pdf_text
+        prompt = f"Đây là một đoạn văn từ tài liệu: {context}\n\nCâu hỏi: {question}\nTrả lời:"
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
         )
-
-        answer = response.choices[0].message.content
-        final_answer = answer.replace("\n", "<br>") + link_html
-
-        return jsonify({"answer": final_answer})
-
+        return response.choices[0].message.content
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return f"Đã xảy ra lỗi: {str(e)}"
 
+# API endpoint
+@app.route("/ask", methods=["POST"])
+def ask():
+    data = request.get_json()
+    question = data.get("question", "")
+    if not question:
+        return jsonify({"error": "Không có câu hỏi."}), 400
+
+    # Kiểm tra nếu câu hỏi có liên quan tới bài học
+    matched = search_lesson_link(question)
+    if matched:
+        return jsonify({
+            "answer": f"Đây là bài học về *{matched['title']}*. Bạn có thể xem tại:\n"
+                      f"- 📘 [Bài giảng]({matched['bai_giang']})\n"
+                      f"- ✏️ [Bài tập]({matched['bai_tap']})"
+        })
+
+    # Nếu không liên quan, dùng AI để trả lời
+    answer = generate_response(question, pdf_text)
+    return jsonify({"answer": answer})
+
+# Chạy server
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 8000))
     app.run(host="0.0.0.0", port=port)
