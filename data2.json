@@ -1,0 +1,14 @@
+{
+  "bai_hoc": [
+    {
+      "chu_de": "Máy tính và em",
+      "tieu_de": "Máy tính là gì?",
+      "link_bai_tap": "<a href=\"https://joynest.helioho.st/templates/view_Exercises.php?id_lecture=1\" target=\"_blank\">MÁY TÍNH</a>"
+    },
+    {
+      "chu_de": "Tạo nội dung bằng máy tính",
+      "tieu_de": "Phần mềm tô màu",
+      "link_bai_giang": "<a href=\"https://joynest.helioho.st/templates/LyThuyet.php?id_class=1&lecture_name=Ph%E1%BA%A7n%20m%E1%BB%81m%20t%C3%B4%20m%C3%A0u&id_lecture=5\" target=\"_blank\">Phần mềm tô màu</a>"
+    }
+  ]
+}

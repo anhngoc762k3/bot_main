@@ -30,11 +30,17 @@ pdf_text = read_pdf("t2.pdf")
 def search_lesson_link(question):
     for lesson in lessons_data:
         if lesson["tieu_de"].lower() in question.lower():
-            return {
-                "title": lesson["tieu_de"],
-                "bai_giang": lesson["link_bai_giang"],
-                "bai_tap": lesson["link_bai_tap"]
-            }
+            title = lesson["tieu_de"]
+            bai_giang = lesson["link_bai_giang"]
+            bai_tap = lesson["link_bai_tap"]
+
+            html_response = (
+                f"Đây là bài học về <strong>{title}</strong>.<br>"
+                f"📘 <a href='{bai_giang}' target='_blank'>Bài giảng</a><br>"
+                f"✏️ <a href='{bai_tap}' target='_blank'>Bài tập</a>"
+            )
+
+            return html_response
     return None
 
 # Chatbot trả lời
@@ -62,9 +68,7 @@ def ask():
     matched = search_lesson_link(question)
     if matched:
         return jsonify({
-            "answer": f"Đây là bài học về *{matched['title']}*. Bạn có thể xem tại:\n"
-                      f"- 📘 [Bài giảng]({matched['bai_giang']})\n"
-                      f"- ✏️ [Bài tập]({matched['bai_tap']})"
+            "answer": matched
         })
 
     # Nếu không liên quan, dùng AI để trả lời
