@@ -86,7 +86,7 @@ def suggest_lecture_links(question_or_answer):
 pdf_file_path = 't2.pdf'
 pdf_text = read_pdf(pdf_file_path)
 
-# Endpoint chính
+# Endpoint chính để nhận câu hỏi
 @app.route("/ask", methods=["POST"])
 def ask():
     data = request.get_json()
@@ -103,6 +103,11 @@ def ask():
         "answer": answer,
         "suggested_links": links
     })
+
+# Endpoint GET /
+@app.route("/", methods=["GET"])
+def index():
+    return "API đang chạy. Gửi POST đến /ask với câu hỏi."
 
 # Chạy server
 if __name__ == "__main__":
