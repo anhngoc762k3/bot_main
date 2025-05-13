@@ -1,20 +1,31 @@
-from flask import Flask, request, jsonify
+import asyncio
+from asyncio import WindowsSelectorEventLoopPolicy
 from g4f.client import Client
 import pdfplumber
-import json
-import os
 
-app = Flask(__name__)
+# Dữ liệu liên kết
+lecture_links = {
+    "Máy tính và em": {
+        "Máy tính là gì?": {
+            "link bài giảng": "https://example.com2/bai-giang-may-tinh",
+            "link bài tập": "https://example.com4/bai-tap-may-tinh"
+        }
+    },
+    "Tạo nội dung bằng máy tính": {
+        "Phần mềm tô màu": {
+            "link bài giảng": "https://example.com/toan-10",
+            "link bài tập": "https://example.com/bai-tap-toan-10"
+        }
+    }
+}
+
+# Thiết lập vòng lặp Windows
+asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
+
+# Khởi tạo client
 client = Client()
 
-# Đọc file JSON bài học
-def load_lessons():
-    with open("data.json", "r", encoding="utf-8") as f:
-        return json.load(f)
-
-lessons_data = load_lessons()
-
-# Đọc nội dung PDF
+# Đọc PDF
 def read_pdf(file_path):
     with pdfplumber.open(file_path) as pdf:
         text = ""
@@ -24,58 +35,60 @@ def read_pdf(file_path):
                 text += extracted + "\n"
     return text
 
-pdf_text = read_pdf("t2.pdf")
-
-# Tìm link từ JSON nếu có liên quan
-def search_lesson_link(question):
-    for lesson in lessons_data:
-        if lesson["tieu_de"].lower() in question.lower():
-            title = lesson["tieu_de"]
-            bai_giang = lesson["link_bai_giang"]
-            bai_tap = lesson["link_bai_tap"]
-
-            html_response = (
-                f"Đây là bài học về <strong>{title}</strong>.<br>"
-                f"📘 <a href='{bai_giang}' target='_blank'>Bài giảng</a><br>"
-                f"✏️ <a href='{bai_tap}' target='_blank'>Bài tập</a>"
-            )
-
-            return html_response
-    return None
-
-# Chatbot trả lời
+# Tạo câu trả lời
 def generate_response(question, pdf_text):
     try:
         context = pdf_text[:6000] if len(pdf_text) > 6000 else pdf_text
-        prompt = f"Đây là một đoạn văn từ tài liệu: {context}\n\nCâu hỏi: {question}\nTrả lời:"
+        prompt = (
+            f"Đây là một đoạn văn từ tài liệu học thuật:\n\n{context}\n\n"
+            f"Câu hỏi: {question}\n"
+            f"Trả lời chi tiết và nếu có thể, hãy đề xuất bài học liên quan.\n"
+        )
+
         response = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
         )
+
         return response.choices[0].message.content
     except Exception as e:
         return f"Đã xảy ra lỗi: {str(e)}"
 
-# API endpoint
-@app.route("/ask", methods=["POST"])
-def ask():
-    data = request.get_json()
-    question = data.get("question", "")
-    if not question:
-        return jsonify({"error": "Không có câu hỏi."}), 400
+# Gợi ý liên kết theo câu hỏi/tiêu đề
+def suggest_lecture_links(question_or_answer):
+    suggestions = []
+    for topic, lessons in lecture_links.items():
+        if topic.lower() in question_or_answer.lower():
+            for title, links in lessons.items():
+                suggestion = f"📘 **{title}**\n"
+                for label, url in links.items():
+                    suggestion += f"- {label}: {url}\n"
+                suggestions.append(suggestion)
+        else:
+            for title, links in lessons.items():
+                if title.lower() in question_or_answer.lower():
+                    suggestion = f"📘 **{title}**\n"
+                    for label, url in links.items():
+                        suggestion += f"- {label}: {url}\n"
+                    suggestions.append(suggestion)
+    return suggestions
 
-    # Kiểm tra nếu câu hỏi có liên quan tới bài học
-    matched = search_lesson_link(question)
-    if matched:
-        return jsonify({
-            "answer": matched
-        })
+# Đọc PDF
+pdf_file_path = 'D11.pdf'
+pdf_text = read_pdf(pdf_file_path)
 
-    # Nếu không liên quan, dùng AI để trả lời
-    answer = generate_response(question, pdf_text)
-    return jsonify({"answer": answer})
-
-# Chạy server
+# Giao diện dòng lệnh
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 8000))
-    app.run(host="0.0.0.0", port=port)
+    while True:
+        question = input("Bạn: ")
+        if question.lower() in ["exit", "quit"]:
+            break
+        answer = generate_response(question, pdf_text)
+        print("\nChatbot:", answer)
+
+        # Gợi ý liên kết
+        suggested_links = suggest_lecture_links(question + " " + answer)
+        if suggested_links:
+            print("\n🔗 Các liên kết liên quan:")
+            for s in suggested_links:
+                print(s)
