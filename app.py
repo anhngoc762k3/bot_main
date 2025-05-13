@@ -76,7 +76,7 @@ def suggest_lecture_links(question_or_answer):
     return suggestions
 
 # Đọc PDF
-pdf_file_path = 'D11.pdf'
+pdf_file_path = 't2.pdf'
 pdf_text = read_pdf(pdf_file_path)
 
 # Giao diện dòng lệnh
