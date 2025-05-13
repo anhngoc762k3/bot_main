@@ -1,5 +1,7 @@
 import asyncio
+import os
 import sys
+from flask import app
 from g4f.client import Client
 import pdfplumber
 
@@ -94,3 +96,7 @@ if __name__ == "__main__":
             print("\n🔗 Các liên kết liên quan:")
             for s in suggested_links:
                 print(s)
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 7000))
+    app.run(host="0.0.0.0", port=port)
