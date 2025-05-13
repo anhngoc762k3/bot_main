@@ -1,9 +1,12 @@
 import asyncio
 import os
 import sys
-from flask import app
+from flask import Flask, request, jsonify
 from g4f.client import Client
 import pdfplumber
+
+# Khởi tạo Flask app
+app = Flask(__name__)
 
 # Dữ liệu liên kết
 lecture_links = {
@@ -21,7 +24,7 @@ lecture_links = {
     }
 }
 
-# Chỉ thiết lập WindowsSelectorEventLoopPolicy nếu đang chạy trên Windows
+# Thiết lập loop cho Windows
 if sys.platform.startswith("win"):
     from asyncio import WindowsSelectorEventLoopPolicy
     asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
@@ -64,39 +67,44 @@ def suggest_lecture_links(question_or_answer):
     for topic, lessons in lecture_links.items():
         if topic.lower() in question_or_answer.lower():
             for title, links in lessons.items():
-                suggestion = f"📘 **{title}**\n"
-                for label, url in links.items():
-                    suggestion += f"- {label}: {url}\n"
+                suggestion = {
+                    "title": title,
+                    "links": links
+                }
                 suggestions.append(suggestion)
         else:
             for title, links in lessons.items():
                 if title.lower() in question_or_answer.lower():
-                    suggestion = f"📘 **{title}**\n"
-                    for label, url in links.items():
-                        suggestion += f"- {label}: {url}\n"
+                    suggestion = {
+                        "title": title,
+                        "links": links
+                    }
                     suggestions.append(suggestion)
     return suggestions
 
-# Đọc PDF
+# Đọc nội dung PDF một lần khi khởi động server
 pdf_file_path = 't2.pdf'
 pdf_text = read_pdf(pdf_file_path)
 
-# Giao diện dòng lệnh
-if __name__ == "__main__":
-    while True:
-        question = input("Bạn: ")
-        if question.lower() in ["exit", "quit"]:
-            break
-        answer = generate_response(question, pdf_text)
-        print("\nChatbot:", answer)
+# Endpoint chính
+@app.route("/ask", methods=["POST"])
+def ask():
+    data = request.get_json()
+    question = data.get("question", "")
 
-        # Gợi ý liên kết
-        suggested_links = suggest_lecture_links(question + " " + answer)
-        if suggested_links:
-            print("\n🔗 Các liên kết liên quan:")
-            for s in suggested_links:
-                print(s)
+    if not question:
+        return jsonify({"error": "Missing question"}), 400
 
+    answer = generate_response(question, pdf_text)
+    links = suggest_lecture_links(question + " " + answer)
+
+    return jsonify({
+        "question": question,
+        "answer": answer,
+        "suggested_links": links
+    })
+
+# Chạy server
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 7000))
     app.run(host="0.0.0.0", port=port)
