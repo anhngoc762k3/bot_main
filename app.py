@@ -1,5 +1,5 @@
 import asyncio
-from asyncio import WindowsSelectorEventLoopPolicy
+import sys
 from g4f.client import Client
 import pdfplumber
 
@@ -19,8 +19,10 @@ lecture_links = {
     }
 }
 
-# Thiết lập vòng lặp Windows
-asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
+# Chỉ thiết lập WindowsSelectorEventLoopPolicy nếu đang chạy trên Windows
+if sys.platform.startswith("win"):
+    from asyncio import WindowsSelectorEventLoopPolicy
+    asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
 
 # Khởi tạo client
 client = Client()
